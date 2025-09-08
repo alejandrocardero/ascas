@@ -1,0 +1,126 @@
+import math
+
+# Función para calcular la distancia entre dos puntos
+def distancia(ciudad1, ciudad2):
+    x1, y1 = ciudad1['x'], ciudad1['y']
+    x2, y2 = ciudad2['x'], ciudad2['y']
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+# Algoritmo heurístico: Vecino Más Cercano
+def vecino_mas_cercano(ciudades):
+    n = len(ciudades)
+    visitadas = [False] * n
+    ruta_indices = []
+    
+    # Empezamos en la primera ciudad (índice 0)
+    actual = 0
+    ruta_indices.append(actual)
+    visitadas[actual] = True
+    
+    # Visitamos las demás ciudades
+    for _ in range(n - 1):
+        menor_distancia = float('inf')
+        siguiente = -1
+        
+        # Buscamos la ciudad no visitada más cercana
+        for i in range(n):
+            if not visitadas[i]:
+                dist = distancia(ciudades[actual], ciudades[i])
+                if dist < menor_distancia:
+                    menor_distancia = dist
+                    siguiente = i
+        
+        ruta_indices.append(siguiente)
+        visitadas[siguiente] = True
+        actual = siguiente
+    
+    # Volvemos al inicio
+    ruta_indices.append(0)
+    return ruta_indices
+
+# Calcular distancia total de la ruta
+def calcular_distancia_total(ruta_indices, ciudades):
+    total = 0
+    for i in range(len(ruta_indices) - 1):
+        total += distancia(ciudades[ruta_indices[i]], ciudades[ruta_indices[i+1]])
+    return total
+
+# Mostrar la ruta con nombres y distancia
+def mostrar_resultado(ciudades, ruta_indices, distancia_total):
+    print("\n" + "✅" * 30)
+    print("🛣️  TU RUTA RECOMENDADA:")
+    print("✅" * 30)
+    
+    ruta_nombres = [ciudades[i]['nombre'] for i in ruta_indices]
+    print(" -> ".join(ruta_nombres))
+    
+    print(f"\n📏 Distancia total recorrida: {distancia_total:.2f} unidades")
+    print("\n📍 Detalle de ciudades:")
+    for ciudad in ciudades:
+        print(f"   {ciudad['nombre']}: ({ciudad['x']}, {ciudad['y']})")
+
+# PROGRAMA PRINCIPAL — INTERACTIVO Y AMIGABLE
+def main():
+    print("🧳🧳🧳 BIENVENIDO AL ASISTENTE DEL VENDEDOR VIAJERO 🧳🧳🧳")
+    print("💡 Este programa te ayudará a encontrar una ruta corta (no óptima) para visitar tus ciudades.")
+    print("📌 Ingresa el nombre y las coordenadas (x, y) de cada ciudad.\n")
+    
+    # Preguntar cuántas ciudades
+    while True:
+        try:
+            n = int(input("¿Cuántas ciudades deseas ingresar? (mínimo 2): "))
+            if n >= 2:
+                break
+            else:
+                print("⚠️  Por favor, ingresa al menos 2 ciudades.")
+        except ValueError:
+            print("⚠️  Por favor, ingresa un número válido.")
+    
+    # Lista para almacenar las ciudades
+    ciudades = []
+    
+    print("\n" + "📍" * 40)
+    for i in range(n):
+        print(f"\n🔹 Ciudad #{i+1}")
+        nombre = input(f"   Nombre de la ciudad: ").strip()
+        while not nombre:
+            nombre = input("   ⚠️  El nombre no puede estar vacío. Ingresa de nuevo: ").strip()
+        
+        # Pedir coordenada X
+        while True:
+            try:
+                x = float(input(f"   Coordenada X de {nombre}: "))
+                break
+            except ValueError:
+                print("   ⚠️  Ingresa un número válido para X.")
+        
+        # Pedir coordenada Y
+        while True:
+            try:
+                y = float(input(f"   Coordenada Y de {nombre}: "))
+                break
+            except ValueError:
+                print("   ⚠️  Ingresa un número válido para Y.")
+        
+        ciudades.append({'nombre': nombre, 'x': x, 'y': y})
+    
+    print("\n" + "⏳" * 20)
+    print("🧠 Calculando la mejor ruta con inteligencia artificial (heurística)...")
+    print("⏳" * 20)
+    
+    # Encontrar la ruta
+    ruta_indices = vecino_mas_cercano(ciudades)
+    distancia_total = calcular_distancia_total(ruta_indices, ciudades)
+    
+    # Mostrar resultado bonito
+    mostrar_resultado(ciudades, ruta_indices, distancia_total)
+    
+    print("\n" + "🎉" * 30)
+    print("✅ ¡Listo! Ruta calculada con éxito.")
+    print("🎉" * 30)
+    print("\n📌 NOTA: Esta ruta es una buena aproximación, pero no necesariamente la óptima.")
+    print("💡 Algoritmo usado: 'Vecino Más Cercano' — ideal para principiantes en IA.")
+
+# Ejecutar el programa
+if __name__ == "__main__":
+    main()
